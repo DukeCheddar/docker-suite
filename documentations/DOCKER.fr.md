@@ -9,23 +9,23 @@ Cette page décrit le système Docker de développement de la suite : les conten
 La suite tourne dans neuf conteneurs, sur un réseau Docker privé. Un seul d'entre eux, `suite-core`, est joignable pour le trafic applicatif.
 
 ```
-               navigateur  (http://suite.local/)
-                    ▲
-                    │ port 80 / 8080
-                    ▼  
-            ┌─────────────────┐
-            │ suite-core(nginx) │ ───────────────────────────────────────────┐
-            └────────┬────────┘                                            │
-   ┌────────┬────────┴──┬───────────┬───────────┬────────────┐             │
-   ▼        ▼           ▼           ▼           ▼            ▼             ▲            
-suite-web  identity  organization  employee  orchestration  storage     notification
-(interface) (API)    (API)        (API)       (API)        (API)       (socket)
-            │          │            │           │            │             │
-            └──────────┴────────────┴─────┬─────┴────────────┴─────────────┘
-                                          ▼
-                                   ┌───────────────┐
-                                   │ suite-event-bus │  redis
-                                   └───────────────┘
+                                 navigateur  (http://suite.local/)
+                                      ▲
+                                      │  port 80 / 8080
+                                      ▼
+                           ┌────────────────────┐
+                           │ suite-core (nginx) │ ──────────────────────────────────┐
+                           └──────────┬─────────┘                                   │
+      ┌────────────┬────────────┬─────┴──────┬────────────┬────────────┐            │
+      ▼            ▼            ▼            ▼            ▼            ▼            ▲
+  suite-web     identity   organization   employee  orchestration   storage    notification
+ (interface)     (API)        (API)        (API)        (API)        (API)       (socket)
+                   │            │            │            │            │            │
+                   └────────────┴────────────┴─────┬──────┴────────────┴────────────┘
+                                                   ▼
+                                      ┌─────────────────────────┐
+                                      │ suite-event-bus (redis) │
+                                      └─────────────────────────┘
 ```
 
 Trois règles donnent sa forme au système :

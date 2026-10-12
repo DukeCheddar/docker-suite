@@ -9,22 +9,23 @@ State described here: 2026-10-12. Container names, host name, addresses and port
 The suite runs as nine containers on one private Docker network. Only one of them, `suite-core`, is reachable for application traffic.
 
 ```
-                 browser  (http://suite.local/)
-                    │
-                    ▼  port 80
-              ┌───────────┐
-              │ suite-core  │  nginx
-              └─────┬─────┘
-   ┌────────┬───────┼──────────┬──────────────┬──────────────┐
-   ▼        ▼       ▼          ▼              ▼              ▼
-suite-web  identity  organization  employee  orchestration  storage     notification
- (UI)     (API)      (API)        (API)       (API)        (API)       (socket)
-            │          │            │           │            │              │
-            └──────────┴────────────┴─────┬─────┴────────────┴──────────────┘
-                                          ▼
-                                   ┌───────────────┐
-                                   │ suite-event-bus │  redis
-                                   └───────────────┘
+                                  browser  (http://suite.local/)
+                                     ▲
+                                     │  port 80 / 8080
+                                     ▼
+                          ┌────────────────────┐
+                          │ suite-core (nginx) │ ─────────────────────────────────┐
+                          └──────────┬─────────┘                                  │
+     ┌───────────┬────────────┬──────┴─────┬────────────┬────────────┐            │
+     ▼           ▼            ▼            ▼            ▼            ▼            ▲
+ suite-web    identity   organization   employee  orchestration   storage    notification
+    (UI)       (API)        (API)        (API)        (API)        (API)       (socket)
+                 │            │            │            │            │            │
+                 └────────────┴────────────┴─────┬──────┴────────────┴────────────┘
+                                                 ▼
+                                    ┌─────────────────────────┐
+                                    │ suite-event-bus (redis) │
+                                    └─────────────────────────┘
 ```
 
 Three rules shape the system:
