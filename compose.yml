@@ -34,7 +34,7 @@ x-service: &service
     resources:
       limits:
         cpus: '1'
-        memory: 1G
+        memory: 3G
       reservations:
         cpus: '1'
         memory: 1G
@@ -94,7 +94,7 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 1G
+          memory: 3G
         reservations:
           cpus: '1'
           memory: 1G
