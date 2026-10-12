@@ -5,7 +5,7 @@
 # Append to ~/.ssh/config, then connect with:  ssh suite-identity
 #
 # Replace before use:
-#   <docker-host-ip>   address of the machine running Docker
+#   HostName           address of the machine running Docker
 #   Port               the *_SSH_PORT of each container in your .env
 #                      (the ports below are placeholders)
 #   User               DEV_USER in your .env
@@ -13,7 +13,7 @@
 # ===============================================
 
 Host suite-*
-    HostName <docker-host-ip>
+    HostName change-me
     User change-me
     IdentityFile change-me
     IdentitiesOnly yes
