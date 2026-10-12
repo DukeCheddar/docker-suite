@@ -14,8 +14,8 @@
 
 Host suite-*
     HostName <docker-host-ip>
-    User dev_user
-    IdentityFile ~/.ssh/id_ed25519
+    User change-me
+    IdentityFile change-me
     IdentitiesOnly yes
 
 Host suite-web
