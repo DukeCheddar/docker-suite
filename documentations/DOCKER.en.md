@@ -189,6 +189,7 @@ docker-suite/
 ├── compose.yml                     the containers and how they are wired
 ├── .env.example                    template of .env, without passwords
 ├── .env                            every setting and every password (not in git)
+├── configs/ssh/config.example      example of SSH client configuration
 ├── configs/nginx/templates/
 │   └── default.conf.template       routing rules of suite-core
 ├── dockerfiles/
@@ -251,6 +252,10 @@ After cloning the repository, the secret files must be created from their templa
 | Check the entry point | `curl http://suite.local/healthz` |
 
 The six service containers share one image: building it once through any of them is enough.
+
+### SSH client configuration
+
+`configs/ssh/config.example` is a ready-made `~/.ssh/config` block for the machine you develop from: one short name per dev container, so that `ssh suite-identity` is enough. Its ports are placeholders; replace them with the `*_SSH_PORT` values of your `.env`.
 
 ### Adding an SSH key
 

@@ -1,0 +1,40 @@
+# ===============================================
+# SSH client configuration example
+# For the machine you develop from, not for the containers.
+#
+# Append to ~/.ssh/config, then connect with:  ssh suite-identity
+#
+# Replace before use:
+#   <docker-host-ip>   address of the machine running Docker
+#   Port               the *_SSH_PORT of each container in your .env
+#                      (the ports below are placeholders)
+#   User               DEV_USER in your .env
+#   IdentityFile       the private key whose public part is in authorized_keys
+# ===============================================
+
+Host suite-*
+    HostName <docker-host-ip>
+    User dev_user
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+
+Host suite-web
+    Port 2201
+
+Host suite-identity
+    Port 2202
+
+Host suite-notification
+    Port 2203
+
+Host suite-organization
+    Port 2204
+
+Host suite-employee
+    Port 2205
+
+Host suite-orchestration
+    Port 2206
+
+Host suite-storage
+    Port 2207

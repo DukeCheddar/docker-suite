@@ -190,6 +190,7 @@ docker-suite/
 ├── compose.yml                     les conteneurs et leurs liens
 ├── .env.example                    gabarit de .env, sans mots de passe
 ├── .env                            tous les paramètres et tous les mots de passe (hors git)
+├── configs/ssh/config.example      exemple de configuration du client SSH
 ├── configs/nginx/templates/
 │   └── default.conf.template       règles d'aiguillage de suite-core
 ├── dockerfiles/
@@ -252,6 +253,10 @@ Après avoir cloné le dépôt, il faut créer les fichiers secrets à partir de
 | Vérifier la porte d'entrée | `curl http://suite.local/healthz` |
 
 Les six conteneurs de service partagent une seule image : il suffit de la construire une fois, par n'importe lequel d'entre eux.
+
+### Configuration du client SSH
+
+`configs/ssh/config.example` est un bloc `~/.ssh/config` prêt à l'emploi pour la machine à partir de laquelle on développe : un nom court par conteneur de développement, de sorte que `ssh suite-identity` suffit. Ses ports sont fictifs; les remplacer par les valeurs `*_SSH_PORT` de votre `.env`.
 
 ### Ajouter une clé SSH
 
