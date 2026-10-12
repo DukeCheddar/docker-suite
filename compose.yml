@@ -1,0 +1,275 @@
+# ============================================
+# Suite Project
+# ============================================
+name: ${PROJET_PREFIX}
+
+networks:
+  suite-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${PROJET_NET}/16
+
+# ============================================
+# Shared by every service container (node + postgres)
+# ============================================
+x-service: &service
+  restart: unless-stopped
+  tty: true
+  image: ${PROJET_PREFIX}-service
+  build:
+    context: ./dockerfiles/service
+    dockerfile: Dockerfile
+    args:
+      USER_NAME: ${DEV_USER}
+      USER_PASSWORD: ${DEV_PASSWORD}
+      USER_UID: ${DEV_UID}
+      USER_GID: ${DEV_GID}
+      EXPOSE_PORT: ${SSH_EXPOSED_PORT}
+      NODE_VERSION: ${NODE_VERSION}
+      POSTGRES_VERSION: ${POSTGRES_VERSION}
+  depends_on:
+    - event-bus
+  deploy:
+    resources:
+      limits:
+        cpus: '1'
+        memory: 1G
+      reservations:
+        cpus: '1'
+        memory: 1G
+
+x-service-env: &service-env
+  DB_HOST: 127.0.0.1
+  DB_PORT: ${DB_PORT}
+  EVENT_BUS_HOST: event-bus
+  EVENT_BUS_PORT: ${EVENT_BUS_PORT}
+  EVENT_BUS_PASSWORD: ${EVENT_BUS_PASSWORD}
+
+services:
+  # ================================================
+  # Core Container - nginx, the only public entry  #
+  # ================================================
+  core:
+    image: nginx:stable
+    restart: unless-stopped
+    tty: true
+    container_name: ${CORE_NAME}
+    hostname: ${CORE_HOST}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    environment:
+      CORE_HTTP_EXPOSED_PORT: ${CORE_HTTP_EXPOSED_PORT}
+      CORE_SERVER_NAME: ${CORE_SERVER_NAME}
+      WEB_UPSTREAM: web:${WEB_HTTP_EXPOSED_PORT}
+      IDENTITY_UPSTREAM: identity:${IDENTITY_API_PORT}
+      ORGANIZATION_UPSTREAM: organization:${ORGANIZATION_API_PORT}
+      EMPLOYEE_UPSTREAM: employee:${EMPLOYEE_API_PORT}
+      ORCHESTRATION_UPSTREAM: orchestration:${ORCHESTRATION_API_PORT}
+      STORAGE_UPSTREAM: storage:${STORAGE_API_PORT}
+      NOTIFICATION_UPSTREAM: notification:${NOTIFICATION_SOCKET_PORT}
+    volumes:
+      - ./configs/nginx/templates:/etc/nginx/templates:ro
+    networks:
+      suite-network:
+        ipv4_address: ${CORE_IP}
+    ports:
+      - "0.0.0.0:${CORE_HTTP_PORT}:${CORE_HTTP_EXPOSED_PORT}"
+
+  # ===============================
+  # Web Container - UI, node only #
+  # ===============================
+  web:
+    restart: unless-stopped
+    tty: true
+    container_name: ${WEB_NAME}
+    hostname: ${WEB_HOST}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    build:
+      context: ./dockerfiles/web
+      dockerfile: Dockerfile
+      args:
+        USER_NAME: ${DEV_USER}
+        USER_PASSWORD: ${DEV_PASSWORD}
+        USER_UID: ${DEV_UID}
+        USER_GID: ${DEV_GID}
+        EXPOSE_PORT: ${SSH_EXPOSED_PORT}
+        WEB_HTTP_EXPOSED_PORT: ${WEB_HTTP_EXPOSED_PORT}
+        NODE_VERSION: ${NODE_VERSION}
+    volumes:
+      - ${LOCAL_VOLUMES_BASE}/documentations:/home/${DEV_USER}/documentations
+      - ${LOCAL_VOLUMES_BASE}/web/workspaces:/home/${DEV_USER}/workspaces
+    networks:
+      suite-network:
+        ipv4_address: ${WEB_IP}
+    ports:
+      - "0.0.0.0:${WEB_SSH_PORT}:${SSH_EXPOSED_PORT}"
+
+  # ====================
+  # Service Containers #
+  # ====================
+  identity:
+    <<: *service
+    container_name: ${IDENTITY_NAME}
+    hostname: ${IDENTITY_HOST}
+    environment:
+      <<: *service-env
+      SERVICE_NAME: identity
+      API_PORT: ${IDENTITY_API_PORT}
+      DB_NAME: ${IDENTITY_DB_NAME}
+      DB_USER: ${IDENTITY_DB_USER}
+      DB_PASSWORD: ${IDENTITY_DB_PASSWORD}
+    volumes:
+      - ${LOCAL_VOLUMES_BASE}/documentations:/home/${DEV_USER}/documentations
+      - ${LOCAL_VOLUMES_BASE}/identity/workspaces:/home/${DEV_USER}/workspaces
+      - ${LOCAL_VOLUMES_BASE}/identity/postgres:/var/lib/postgresql/data
+    networks:
+      suite-network:
+        ipv4_address: ${IDENTITY_IP}
+    ports:
+      - "0.0.0.0:${IDENTITY_SSH_PORT}:${SSH_EXPOSED_PORT}"
+
+  notification:
+    <<: *service
+    container_name: ${NOTIFICATION_NAME}
+    hostname: ${NOTIFICATION_HOST}
+    environment:
+      <<: *service-env
+      SERVICE_NAME: notification
+      SOCKET_PORT: ${NOTIFICATION_SOCKET_PORT}
+      DB_NAME: ${NOTIFICATION_DB_NAME}
+      DB_USER: ${NOTIFICATION_DB_USER}
+      DB_PASSWORD: ${NOTIFICATION_DB_PASSWORD}
+    volumes:
+      - ${LOCAL_VOLUMES_BASE}/documentations:/home/${DEV_USER}/documentations
+      - ${LOCAL_VOLUMES_BASE}/notification/workspaces:/home/${DEV_USER}/workspaces
+      - ${LOCAL_VOLUMES_BASE}/notification/postgres:/var/lib/postgresql/data
+    networks:
+      suite-network:
+        ipv4_address: ${NOTIFICATION_IP}
+    ports:
+      - "0.0.0.0:${NOTIFICATION_SSH_PORT}:${SSH_EXPOSED_PORT}"
+
+  organization:
+    <<: *service
+    container_name: ${ORGANIZATION_NAME}
+    hostname: ${ORGANIZATION_HOST}
+    environment:
+      <<: *service-env
+      SERVICE_NAME: organization
+      API_PORT: ${ORGANIZATION_API_PORT}
+      DB_NAME: ${ORGANIZATION_DB_NAME}
+      DB_USER: ${ORGANIZATION_DB_USER}
+      DB_PASSWORD: ${ORGANIZATION_DB_PASSWORD}
+    volumes:
+      - ${LOCAL_VOLUMES_BASE}/documentations:/home/${DEV_USER}/documentations
+      - ${LOCAL_VOLUMES_BASE}/organization/workspaces:/home/${DEV_USER}/workspaces
+      - ${LOCAL_VOLUMES_BASE}/organization/postgres:/var/lib/postgresql/data
+    networks:
+      suite-network:
+        ipv4_address: ${ORGANIZATION_IP}
+    ports:
+      - "0.0.0.0:${ORGANIZATION_SSH_PORT}:${SSH_EXPOSED_PORT}"
+
+  employee:
+    <<: *service
+    container_name: ${EMPLOYEE_NAME}
+    hostname: ${EMPLOYEE_HOST}
+    environment:
+      <<: *service-env
+      SERVICE_NAME: employee
+      API_PORT: ${EMPLOYEE_API_PORT}
+      DB_NAME: ${EMPLOYEE_DB_NAME}
+      DB_USER: ${EMPLOYEE_DB_USER}
+      DB_PASSWORD: ${EMPLOYEE_DB_PASSWORD}
+    volumes:
+      - ${LOCAL_VOLUMES_BASE}/documentations:/home/${DEV_USER}/documentations
+      - ${LOCAL_VOLUMES_BASE}/employee/workspaces:/home/${DEV_USER}/workspaces
+      - ${LOCAL_VOLUMES_BASE}/employee/postgres:/var/lib/postgresql/data
+    networks:
+      suite-network:
+        ipv4_address: ${EMPLOYEE_IP}
+    ports:
+      - "0.0.0.0:${EMPLOYEE_SSH_PORT}:${SSH_EXPOSED_PORT}"
+
+  orchestration:
+    <<: *service
+    container_name: ${ORCHESTRATION_NAME}
+    hostname: ${ORCHESTRATION_HOST}
+    environment:
+      <<: *service-env
+      SERVICE_NAME: orchestration
+      API_PORT: ${ORCHESTRATION_API_PORT}
+      DB_NAME: ${ORCHESTRATION_DB_NAME}
+      DB_USER: ${ORCHESTRATION_DB_USER}
+      DB_PASSWORD: ${ORCHESTRATION_DB_PASSWORD}
+    volumes:
+      - ${LOCAL_VOLUMES_BASE}/documentations:/home/${DEV_USER}/documentations
+      - ${LOCAL_VOLUMES_BASE}/orchestration/workspaces:/home/${DEV_USER}/workspaces
+      - ${LOCAL_VOLUMES_BASE}/orchestration/postgres:/var/lib/postgresql/data
+    networks:
+      suite-network:
+        ipv4_address: ${ORCHESTRATION_IP}
+    ports:
+      - "0.0.0.0:${ORCHESTRATION_SSH_PORT}:${SSH_EXPOSED_PORT}"
+
+  # ===================
+  # System Containers #
+  # ===================
+  # Suite Storage: memberships, payments and organizations of the clients using the suite
+  storage:
+    <<: *service
+    container_name: ${STORAGE_NAME}
+    hostname: ${STORAGE_HOST}
+    environment:
+      <<: *service-env
+      SERVICE_NAME: storage
+      API_PORT: ${STORAGE_API_PORT}
+      DB_NAME: ${STORAGE_DB_NAME}
+      DB_USER: ${STORAGE_DB_USER}
+      DB_PASSWORD: ${STORAGE_DB_PASSWORD}
+    volumes:
+      - ${LOCAL_VOLUMES_BASE}/documentations:/home/${DEV_USER}/documentations
+      - ${LOCAL_VOLUMES_BASE}/storage/workspaces:/home/${DEV_USER}/workspaces
+      - ${LOCAL_VOLUMES_BASE}/storage/postgres:/var/lib/postgresql/data
+    networks:
+      suite-network:
+        ipv4_address: ${STORAGE_IP}
+    ports:
+      - "0.0.0.0:${STORAGE_SSH_PORT}:${SSH_EXPOSED_PORT}"
+
+  # Suite Event Bus: redis, the only link between the service containers
+  event-bus:
+    image: redis:7
+    container_name: ${EVENT_BUS_NAME}
+    hostname: ${EVENT_BUS_HOST}
+    restart: always
+    environment:
+      REDIS_PASSWORD: ${EVENT_BUS_PASSWORD}
+    command: redis-server --port ${EVENT_BUS_PORT} --requirepass ${EVENT_BUS_PASSWORD} --appendonly yes
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    volumes:
+      - ${LOCAL_VOLUMES_BASE}/event-bus/data:/data
+    networks:
+      suite-network:
+        ipv4_address: ${EVENT_BUS_IP}

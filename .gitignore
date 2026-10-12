@@ -1,0 +1,17 @@
+# Secrets: real values stay local, templates are the *.example files
+.env
+dockerfiles/*/configs/etc/ssh/authorized_keys
+
+# Container data
+volumes/*/postgres/
+volumes/event-bus/
+
+# Shared documentation is its own repository, placed in this folder
+volumes/documentations/
+
+# Source code of each service lives in its workspace, outside this repository
+volumes/*/workspaces/*
+!volumes/*/workspaces/.gitkeep
+
+# Claude session instructions stay local
+CLAUDE.md

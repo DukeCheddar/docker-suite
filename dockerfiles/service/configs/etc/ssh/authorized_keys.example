@@ -1,0 +1,3 @@
+# Template: copy to authorized_keys (same folder), then add one public key per line.
+# authorized_keys is ignored by git.
+# ssh-ed25519 AAAA... user@machine
