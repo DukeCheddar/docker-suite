@@ -59,13 +59,13 @@ Réseau : `suite-network`, sous-réseau `172.146.0.0/16`. Chaque conteneur a une
 | Conteneur | Adresse | Port sur l'hôte | Port interne |
 | --- | --- | --- | --- |
 | `suite-core` | 172.146.0.10 | **80** (HTTP) | 80 |
-| `suite-web` | 172.146.0.16 | 55337 (SSH) | 4200 (interface), 22 (SSH) |
-| `suite-identity` | 172.146.0.21 | 55331 (SSH) | 3000 (API), 22 (SSH) |
-| `suite-notification` | 172.146.0.22 | 55332 (SSH) | 3000 (socket), 22 (SSH) |
-| `suite-organization` | 172.146.0.23 | 55333 (SSH) | 3000 (API), 22 (SSH) |
-| `suite-employee` | 172.146.0.24 | 55334 (SSH) | 3000 (API), 22 (SSH) |
-| `suite-orchestration` | 172.146.0.25 | 55336 (SSH) | 3000 (API), 22 (SSH) |
-| `suite-storage` | 172.146.0.31 | 55335 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-web` | 172.146.0.16 | 2201 (SSH) | 4200 (interface), 22 (SSH) |
+| `suite-identity` | 172.146.0.21 | 2202 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-notification` | 172.146.0.22 | 2203 (SSH) | 3000 (socket), 22 (SSH) |
+| `suite-organization` | 172.146.0.23 | 2204 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-employee` | 172.146.0.24 | 2205 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-orchestration` | 172.146.0.25 | 2206 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-storage` | 172.146.0.31 | 2207 (SSH) | 3000 (API), 22 (SSH) |
 | `suite-event-bus` | 172.146.0.63 | aucun | 6379 (Redis) |
 
 - **Le port 80 de `suite-core` est le seul port applicatif publié sur l'hôte.** Les ports des API, de l'interface, du socket, de PostgreSQL et de Redis sont internes.
@@ -249,7 +249,7 @@ Après avoir cloné le dépôt, il faut créer les fichiers secrets à partir de
 | Reconstruire l'image des services | `docker compose build identity`, puis `docker compose up -d` |
 | Reconstruire l'image web | `docker compose build web`, puis `docker compose up -d` |
 | Ouvrir une session à partir de l'hôte | `docker exec -it -u dev_user suite-identity bash` |
-| Ouvrir une session à partir d'une autre machine | `ssh -p 55331 dev_user@<docker-host-ip>` |
+| Ouvrir une session à partir d'une autre machine | `ssh -p 2202 dev_user@<docker-host-ip>` |
 | Vérifier la porte d'entrée | `curl http://suite.local/healthz` |
 
 Les six conteneurs de service partagent une seule image : il suffit de la construire une fois, par n'importe lequel d'entre eux.

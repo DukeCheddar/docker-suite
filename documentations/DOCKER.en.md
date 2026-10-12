@@ -58,13 +58,13 @@ Network: `suite-network`, subnet `172.146.0.0/16`. Every container has a fixed a
 | Container | Address | Host port | Internal port |
 | --- | --- | --- | --- |
 | `suite-core` | 172.146.0.10 | **80** (HTTP) | 80 |
-| `suite-web` | 172.146.0.16 | 55337 (SSH) | 4200 (UI), 22 (SSH) |
-| `suite-identity` | 172.146.0.21 | 55331 (SSH) | 3000 (API), 22 (SSH) |
-| `suite-notification` | 172.146.0.22 | 55332 (SSH) | 3000 (socket), 22 (SSH) |
-| `suite-organization` | 172.146.0.23 | 55333 (SSH) | 3000 (API), 22 (SSH) |
-| `suite-employee` | 172.146.0.24 | 55334 (SSH) | 3000 (API), 22 (SSH) |
-| `suite-orchestration` | 172.146.0.25 | 55336 (SSH) | 3000 (API), 22 (SSH) |
-| `suite-storage` | 172.146.0.31 | 55335 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-web` | 172.146.0.16 | 2201 (SSH) | 4200 (UI), 22 (SSH) |
+| `suite-identity` | 172.146.0.21 | 2202 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-notification` | 172.146.0.22 | 2203 (SSH) | 3000 (socket), 22 (SSH) |
+| `suite-organization` | 172.146.0.23 | 2204 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-employee` | 172.146.0.24 | 2205 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-orchestration` | 172.146.0.25 | 2206 (SSH) | 3000 (API), 22 (SSH) |
+| `suite-storage` | 172.146.0.31 | 2207 (SSH) | 3000 (API), 22 (SSH) |
 | `suite-event-bus` | 172.146.0.63 | none | 6379 (Redis) |
 
 - **Port 80 on `suite-core` is the only application port published on the host.** API, UI, socket, PostgreSQL and Redis ports are internal.
@@ -248,7 +248,7 @@ After cloning the repository, the secret files must be created from their templa
 | Rebuild the service image | `docker compose build identity`, then `docker compose up -d` |
 | Rebuild the web image | `docker compose build web`, then `docker compose up -d` |
 | Open a session from the host | `docker exec -it -u dev_user suite-identity bash` |
-| Open a session from another machine | `ssh -p 55331 dev_user@<docker-host-ip>` |
+| Open a session from another machine | `ssh -p 2202 dev_user@<docker-host-ip>` |
 | Check the entry point | `curl http://suite.local/healthz` |
 
 The six service containers share one image: building it once through any of them is enough.
