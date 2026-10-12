@@ -4,7 +4,7 @@
 
 ## English
 
-Docker Compose configuration for a multi-service development environment. It holds the system and service configuration only; the application code and the shared documentation live in separate repositories.
+Docker Compose configuration for a multi-service development environment: the containers, their network and the routing between them.
 
 | Part | Role |
 | --- | --- |
@@ -26,7 +26,7 @@ Licence: [MIT](LICENSE).
 
 ## Français
 
-Configuration Docker Compose d'un environnement de développement à plusieurs services. Ce dépôt ne contient que la configuration du système et des services; le code applicatif et la documentation partagée vivent dans des dépôts distincts.
+Configuration Docker Compose d'un environnement de développement à plusieurs services : les conteneurs, leur réseau et l'aiguillage entre eux.
 
 | Partie | Rôle |
 | --- | --- |
